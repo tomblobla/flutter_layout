@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> {
     light = 'GREEN';
     instruction = 'GO';
     instructionColor = Colors.green[500];
-    _counter = 5;
+    _counter = 30;
     super.initState();
   }
 
@@ -68,13 +68,25 @@ class _MyAppState extends State<MyApp> {
     else
       _stopTimer();
     run = !run;
-    btnDisplayTxt = run ? "Stop" : "Start";
+    setState(() {
+      btnDisplayTxt = run ? "Stop" : "Start";
+    });
   }
 
   int turnOnLight(String lightactive) {
     int num = 100;
 
     if (light == lightactive) {
+      num = 500;
+    }
+    return num;
+  }
+
+  int getWalkState(String walkstate) {
+    int num = 100;
+
+    if ((walkstate == "UNWALK" && (light == "GREEN" || light == "YELLOW")) ||
+        (walkstate == "WALK" && light == "RED")) {
       num = 500;
     }
     return num;
@@ -95,12 +107,12 @@ class _MyAppState extends State<MyApp> {
             light = 'RED';
             instruction = 'STOP';
             instructionColor = Colors.red[500];
-            _counter = 5;
+            _counter = 15;
           } else {
             light = 'GREEN';
             instruction = 'GO';
             instructionColor = Colors.green[500];
-            _counter = 5;
+            _counter = 30;
           }
         }
       });
@@ -110,10 +122,11 @@ class _MyAppState extends State<MyApp> {
   void _stopTimer() {
     _timer?.cancel();
     setState(() {
+      // reset state to the begin
       light = 'GREEN';
       instruction = 'GO';
       instructionColor = Colors.green[500];
-      _counter = 5;
+      _counter = 30;
     });
   }
 
@@ -127,7 +140,7 @@ class _MyAppState extends State<MyApp> {
                 backgroundColor: Colors.teal[300]),
             body: Center(
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Text(
@@ -138,20 +151,48 @@ class _MyAppState extends State<MyApp> {
                       _counter.toString(),
                       style: TextStyle(fontSize: 40, color: instructionColor),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.circle,
-                            size: 60,
-                            color: Colors.green[turnOnLight('GREEN')]),
-                        Icon(Icons.circle,
-                            size: 60,
-                            color: Colors.orange[turnOnLight('YELLOW')]),
-                        Icon(Icons.circle,
-                            size: 60, color: Colors.red[turnOnLight('RED')]),
-                      ],
-                    ),
-                    ElevatedButton(onPressed: timer, child: Text(btnDisplayTxt))
+                    Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 5,
+                            ),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.circle,
+                                size: 60,
+                                color: Colors.green[turnOnLight('GREEN')]),
+                            Icon(Icons.circle,
+                                size: 60,
+                                color: Colors.orange[turnOnLight('YELLOW')]),
+                            Icon(Icons.circle,
+                                size: 60,
+                                color: Colors.red[turnOnLight('RED')]),
+                          ],
+                        )),
+                    ElevatedButton(
+                        onPressed: timer, child: Text(btnDisplayTxt)),
+                    Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 5,
+                            ),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Icon(Icons.nordic_walking,
+                                  size: 60,
+                                  color: Colors.green[getWalkState('WALK')]),
+                              Icon(Icons.nordic_walking,
+                                  size: 60,
+                                  color: Colors.red[getWalkState('UNWALK')])
+                            ]))
                   ]),
             )));
   }
